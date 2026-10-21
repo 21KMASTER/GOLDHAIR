@@ -1,857 +1,652 @@
 <!DOCTYPE html>
-<html lang="th" class="dark">
+<html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOLDHAIR - โปรแกรมช่วยแต่งเพลง & คลังประโยคคำคล้องจอง</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        joox: {
-                            bg: '#121213',
-                            card: '#1a1a1c',
-                            cardHover: '#242428',
-                            sidebar: '#0d0d0e',
-                            green: '#00E676',
-                            greenHover: '#00C853',
-                            darkGreen: '#00381e',
-                            accent: '#18181b',
-                            border: '#2a2a2e',
-                            textMuted: '#9a9a9e'
-                        }
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOLDHAIR — Songwriter Word Vault</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            joox: {
+              green: '#00E676',
+              darkGreen: '#00B359',
+              black: '#121213',
+              card: '#18181A',
+              sidebar: '#0A0A0B',
+              hover: '#222225',
+              border: '#2A2A2E',
+              text: '#A0A0A5'
             }
+          },
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif']
+          }
         }
-    </script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Prompt -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Prompt', sans-serif;
-            background-color: #121213;
-            color: #f4f4f5;
-        }
-        /* Custom Scrollbar JOOX Style */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #121213;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2a2a2e;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #00E676;
-        }
-        .glow-green {
-            box-shadow: 0 0 15px rgba(0, 230, 118, 0.25);
-        }
-        .glow-green-sm {
-            box-shadow: 0 0 8px rgba(0, 230, 118, 0.15);
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Kanit', sans-serif;
+      background-color: #121213;
+      color: #FFFFFF;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0A0A0B;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2A2A2E;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00E676;
+    }
+    .neon-glow {
+      box-shadow: 0 0 15px rgba(0, 230, 118, 0.25);
+    }
+  </style>
 </head>
-<body class="h-screen flex flex-col md:flex-row overflow-hidden bg-joox-bg text-gray-100 select-none">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden select-none">
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- LEFT SIDEBAR (JOOX Style Navigation) -->
-    <aside class="w-full md:w-64 bg-joox-sidebar border-b md:border-b-0 md:border-r border-joox-border flex flex-col justify-between shrink-0 z-20">
-        <div>
-            <!-- Logo Header -->
-            <div class="p-5 flex items-center justify-between border-b border-joox-border/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-joox-green to-emerald-300 flex items-center justify-center text-black font-extrabold text-xl shadow-lg glow-green">
-                        GH
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-lg tracking-wider text-white flex items-center gap-1.5">
-                            GOLDHAIR <span class="text-[10px] bg-joox-green/20 text-joox-green px-1.5 py-0.5 rounded border border-joox-green/30">PRO</span>
-                        </h1>
-                        <p class="text-xs text-joox-textMuted">Songwriter Assistant</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Navigation Links -->
-            <nav class="p-3 space-y-1">
-                <button onclick="switchTab('vault')" id="nav-vault" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-joox-green/10 text-joox-green border border-joox-green/20">
-                    <i class="fa-solid font-bold fa-compact-disc text-base"></i>
-                    <span>คลังประโยค (Vault)</span>
-                </button>
-                <button onclick="switchTab('import')" id="nav-import" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-joox-card transition-all">
-                    <i class="fa-solid fa-file-circle-plus text-base"></i>
-                    <span>เพิ่มบทความ / สกัดคำ</span>
-                </button>
-                <button onclick="switchTab('rhyme')" id="nav-rhyme" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-joox-card transition-all">
-                    <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
-                    <span>ค้นหาคำคล้องจอง</span>
-                </button>
-                <button onclick="switchTab('backup')" id="nav-backup" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-joox-card transition-all">
-                    <i class="fa-solid fa-cloud-arrow-down text-base"></i>
-                    <span>สำรอง & ย้ายข้อมูล</span>
-                </button>
-            </nav>
+  <!-- SIDEBAR -->
+  <aside class="w-full md:w-64 bg-joox-sidebar border-b md:border-b-0 md:border-r border-joox-border flex flex-col justify-between shrink-0">
+    <div>
+      <div class="p-5 flex items-center justify-between border-b border-joox-border/50">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-joox-green flex items-center justify-center text-joox-black font-bold text-xl neon-glow">
+            <i class="fa-solid font-black">G</i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg leading-none tracking-wider text-white">GOLDHAIR</h1>
+            <span class="text-[10px] text-joox-green font-medium tracking-widest uppercase">Word Vault</span>
+          </div>
         </div>
+      </div>
 
-        <!-- Quick Stats Footer -->
-        <div class="p-4 border-t border-joox-border/50 bg-joox-card/30 m-3 rounded-xl text-xs space-y-2">
-            <div class="flex justify-between text-joox-textMuted">
-                <span>ประโยคทั้งหมด:</span>
-                <span id="statTotalSentences" class="text-joox-green font-bold">0</span>
-            </div>
-            <div class="flex justify-between text-joox-textMuted">
-                <span>สถานะระบบ:</span>
-                <span class="text-emerald-400 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span> Offline Ready
-                </span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-joox-bg">
-
-        <!-- TAB 1: SENTENCE VAULT (คลังประโยคหลัก) -->
-        <section id="tab-vault" class="flex-1 flex flex-col min-h-0">
-            <!-- Top Controls & Filters -->
-            <div class="p-4 md:p-6 border-b border-joox-border bg-joox-card/40 backdrop-blur space-y-4">
-                <!-- Search bar & Quick Stats -->
-                <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-                    <div class="relative flex-1">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="vaultSearchInput" oninput="renderVaultSentences()" placeholder="ค้นหาตามข้อความ, คำท้าย, สระ..." 
-                            class="w-full pl-11 pr-4 py-2.5 bg-joox-card border border-joox-border rounded-xl focus:outline-none focus:border-joox-green text-sm text-white placeholder-gray-500">
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-joox-textMuted whitespace-nowrap">เรียงตาม:</span>
-                        <select id="vaultSortSelect" onchange="renderVaultSentences()" class="bg-joox-card border border-joox-border text-xs rounded-xl px-3 py-2 text-white focus:outline-none focus:border-joox-green">
-                            <option value="newest">เพิ่มล่าสุด</option>
-                            <option value="oldest">เก่าสุด</option>
-                            <option value="lengthAsc">สั้น -> ยาว</option>
-                            <option value="lengthDesc">ยาว -> สั้น</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Filters Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                    <!-- Filter: Syllables -->
-                    <div>
-                        <label class="block text-joox-textMuted mb-1 font-medium">จำนวนพยางค์ (คำ)</label>
-                        <select id="filterSyllable" onchange="renderVaultSentences()" class="w-full bg-joox-card border border-joox-border rounded-lg p-2 text-white focus:outline-none focus:border-joox-green">
-                            <option value="ALL">ทั้งหมด</option>
-                            <option value="1">1 พยางค์</option>
-                            <option value="2">2 พยางค์</option>
-                            <option value="3">3 พยางค์</option>
-                            <option value="4">4 พยางค์</option>
-                            <option value="5+">5 พยางค์ขึ้นไป</option>
-                        </select>
-                    </div>
-                    <!-- Filter: Intent -->
-                    <div>
-                        <label class="block text-joox-textMuted mb-1 font-medium">เจตนาการสื่อสาร</label>
-                        <select id="filterIntent" onchange="renderVaultSentences()" class="w-full bg-joox-card border border-joox-border rounded-lg p-2 text-white focus:outline-none focus:border-joox-green">
-                            <option value="ALL">ทั้งหมด</option>
-                            <option value="บอกเล่า">บอกเล่า</option>
-                            <option value="ปฏิเสธ">ปฏิเสธ</option>
-                            <option value="คำถาม">คำถาม</option>
-                            <option value="คำสั่ง/ห้าม">คำสั่ง/ห้าม</option>
-                            <option value="ขอร้อง/ชักชวน">ขอร้อง/ชักชวน</option>
-                            <option value="แสดงความต้องการ">แสดงความต้องการ</option>
-                            <option value="ไม่ได้ระบุ">ยังไม่ระบุ</option>
-                        </select>
-                    </div>
-                    <!-- Filter: Structure -->
-                    <div>
-                        <label class="block text-joox-textMuted mb-1 font-medium">โครงสร้างประโยค</label>
-                        <select id="filterStructure" onchange="renderVaultSentences()" class="w-full bg-joox-card border border-joox-border rounded-lg p-2 text-white focus:outline-none focus:border-joox-green">
-                            <option value="ALL">ทั้งหมด</option>
-                            <option value="S - V">S - V (ประธาน + กริยา)</option>
-                            <option value="S - V - O">S - V - O (มาตรฐาน)</option>
-                            <option value="O - S - V">O - S - V (เน้นกรรม)</option>
-                            <option value="V - S">V - S (เกิด/มี)</option>
-                            <option value="S - V - O1 O2">S - V - O1 O2 (มอบให้)</option>
-                            <option value="S - V - C">S - V - C (เป็น/คือ/เปรียบ)</option>
-                            <option value="ไม่ได้ระบุ">ยังไม่ระบุ</option>
-                        </select>
-                    </div>
-                    <!-- Filter: Mood -->
-                    <div>
-                        <label class="block text-joox-textMuted mb-1 font-medium">อารมณ์/วิบ (Mood)</label>
-                        <select id="filterMood" onchange="renderVaultSentences()" class="w-full bg-joox-card border border-joox-border rounded-lg p-2 text-white focus:outline-none focus:border-joox-green">
-                            <option value="ALL">ทั้งหมด</option>
-                            <option value="อกหัก">อกหัก</option>
-                            <option value="คิดถึง">คิดถึง</option>
-                            <option value="สดใส">สดใส</option>
-                            <option value="แอบรัก">แอบรัก</option>
-                            <option value="เศร้า">เศร้า</option>
-                            <option value="เหงา">เหงา</option>
-                            <option value="อบอุ่น">อบอุ่น</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sentence Grid/List View -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-6">
-                <div id="vaultList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Cards generated via JS -->
-                </div>
-                <div id="vaultEmpty" class="hidden flex-col items-center justify-center py-16 text-center text-joox-textMuted">
-                    <i class="fa-solid fa-box-open text-5xl mb-3 text-gray-600"></i>
-                    <p class="text-base font-medium">ไม่พบประโยคตามเงื่อนไขที่เลือก</p>
-                    <p class="text-xs mt-1">ลองเปลี่ยนตัวกรอง หรือเพิ่มบทความใหม่ในเมนูด้านซ้าย</p>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- TAB 2: IMPORT TEXT / ARTICLE (สกัดคำจากบทความ) -->
-        <section id="tab-import" class="hidden flex-1 flex-col min-h-0 overflow-y-auto p-4 md:p-8 space-y-6">
-            <div class="max-w-4xl mx-auto w-full space-y-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-file-circle-plus text-joox-green"></i> เพิ่มบทความ / นิตยสาร / นิยาย
-                    </h2>
-                    <p class="text-sm text-joox-textMuted mt-1">
-                        วางเนื้อหาหรือบทความลงในช่องด้านล่าง ระบบจะตัดคำ แยกประโยคให้อัตโนมัติ และกำจัดประโยคที่ซ้ำซ้อนทันที
-                    </p>
-                </div>
-
-                <!-- Input Box -->
-                <div class="bg-joox-card border border-joox-border rounded-2xl p-5 space-y-4 shadow-xl">
-                    <textarea id="importRawText" rows="8" placeholder="วางบทความ, นิยาย, คำพูด, หรือเนื้อเพลงย่อหน้าใหญ่ๆ ได้ที่นี่..."
-                        class="w-full bg-joox-bg border border-joox-border rounded-xl p-4 text-sm text-white focus:outline-none focus:border-joox-green resize-y placeholder-gray-600 leading-relaxed"></textarea>
-                    
-                    <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-                        <div class="text-xs text-joox-textMuted flex items-center gap-2">
-                            <i class="fa-solid fa-circle-info text-joox-green"></i>
-                            <span>ระบบแยกด้วย เครื่องหมายวรรคตอน (.), เว้นวรรคใหญ่, หรือขึ้นบรรทัดใหม่</span>
-                        </div>
-                        <button onclick="processArticleImport()" class="px-6 py-2.5 bg-joox-green hover:bg-joox-greenHover text-black font-semibold rounded-xl text-sm transition-all shadow-md glow-green flex items-center gap-2">
-                            <i class="fa-solid fa-bolt"></i> สกัดประโยค & บันทึก
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Preview extracted results -->
-                <div id="importResultBox" class="hidden bg-joox-card border border-joox-border rounded-2xl p-5 space-y-4">
-                    <div class="flex items-center justify-between border-b border-joox-border pb-3">
-                        <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-joox-green"></i>
-                            ผลการสกัดข้อมูลล่าสุด
-                        </h3>
-                        <span id="importSummaryBadge" class="text-xs bg-joox-green/20 text-joox-green px-2.5 py-1 rounded-full border border-joox-green/30">
-                            พบ 0 ประโยคใหม่
-                        </span>
-                    </div>
-                    <div id="importPreviewList" class="max-h-60 overflow-y-auto space-y-2 pr-2 text-sm text-gray-300">
-                        <!-- Preview Items -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- TAB 3: RHYME FINDER (ค้นหาคำคล้องจอง) -->
-        <section id="tab-rhyme" class="hidden flex-1 flex-col min-h-0 overflow-y-auto p-4 md:p-8 space-y-6">
-            <div class="max-w-4xl mx-auto w-full space-y-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles text-joox-green"></i> เครื่องมือค้นหาคำคล้องจอง (Rhyme Finder)
-                    </h2>
-                    <p class="text-sm text-joox-textMuted mt-1">
-                        พิมพ์แค่ **คำเดียว** หรือ **พยางค์เดียว** ที่ต้องการสัมผัส (เช่น ใจ, รัก, บิน, เธอ, ดาว) โปรแกรมจะค้นหาประโยคทั้งหมดในคลังที่คำท้ายคล้องจองกับคำของคุณ
-                    </p>
-                </div>
-
-                <!-- Rhyme Search Input Bar -->
-                <div class="bg-joox-card border border-joox-border rounded-2xl p-6 shadow-xl space-y-4">
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <div class="relative flex-1">
-                            <input type="text" id="rhymeKeywordInput" placeholder="พิมพ์คำเดียว เช่น ใจ, รัก, ดาว..." 
-                                onkeyup="if(event.key==='Enter') executeRhymeSearch()"
-                                class="w-full bg-joox-bg border border-joox-border rounded-xl px-5 py-3.5 text-lg font-semibold text-joox-green focus:outline-none focus:border-joox-green placeholder-gray-600">
-                        </div>
-                        <button onclick="executeRhymeSearch()" class="px-8 py-3.5 bg-joox-green hover:bg-joox-greenHover text-black font-bold rounded-xl text-sm transition-all shadow-md glow-green flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass"></i> ค้นหาประโยคคล้องจอง
-                        </button>
-                    </div>
-
-                    <!-- Quick Rhyme Suggestion Chips -->
-                    <div class="flex flex-wrap items-center gap-2 pt-2 text-xs text-joox-textMuted">
-                        <span>คำฮิตติดเพลง:</span>
-                        <button onclick="setRhymeInput('ใจ')" class="px-2.5 py-1 bg-joox-bg hover:bg-joox-border rounded-lg text-gray-300 border border-joox-border">ใจ</button>
-                        <button onclick="setRhymeInput('รัก')" class="px-2.5 py-1 bg-joox-bg hover:bg-joox-border rounded-lg text-gray-300 border border-joox-border">รัก</button>
-                        <button onclick="setRhymeInput('เธอ')" class="px-2.5 py-1 bg-joox-bg hover:bg-joox-border rounded-lg text-gray-300 border border-joox-border">เธอ</button>
-                        <button onclick="setRhymeInput('กาล')" class="px-2.5 py-1 bg-joox-bg hover:bg-joox-border rounded-lg text-gray-300 border border-joox-border">กาล</button>
-                        <button onclick="setRhymeInput('ฟ้า')" class="px-2.5 py-1 bg-joox-bg hover:bg-joox-border rounded-lg text-gray-300 border border-joox-border">ฟ้า</button>
-                    </div>
-                </div>
-
-                <!-- Rhyme Results List -->
-                <div id="rhymeResultContainer" class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-semibold text-gray-300" id="rhymeResultTitle">ผลการค้นหาคำคล้องจอง</h3>
-                        <span id="rhymeResultCount" class="text-xs text-joox-green font-mono">0 ประโยค</span>
-                    </div>
-
-                    <div id="rhymeResultsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Rhyme Cards injected by JS -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- TAB 4: BACKUP & SYNC (นำเข้า/ส่งออก ข้อมูล) -->
-        <section id="tab-backup" class="hidden flex-1 flex-col min-h-0 overflow-y-auto p-4 md:p-8 space-y-6">
-            <div class="max-w-4xl mx-auto w-full space-y-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-down text-joox-green"></i> สำรอง & ย้ายข้อมูล (MacBook / PC / iPad / iPhone)
-                    </h2>
-                    <p class="text-sm text-joox-textMuted mt-1">
-                        สามารถส่งออกคลังประโยคเป็นไฟล์ JSON เพื่อนำไปใช้งานต่อในอุปกรณ์อื่นๆ ได้ทันที แม้อยู่ในโหมดออฟไลน์
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Export Card -->
-                    <div class="bg-joox-card border border-joox-border rounded-2xl p-6 space-y-4 flex flex-col justify-between">
-                        <div>
-                            <div class="w-12 h-12 rounded-xl bg-joox-green/10 text-joox-green flex items-center justify-center text-xl mb-3">
-                                <i class="fa-solid fa-file-export"></i>
-                            </div>
-                            <h3 class="font-bold text-lg text-white">ส่งออกข้อมูล (Export)</h3>
-                            <p class="text-xs text-joox-textMuted mt-2 leading-relaxed">
-                                ดาวน์โหลดประโยคทั้งหมดที่คุณเก็บและตกแต่งไว้เป็นไฟล์สำรอง สามารถนำไฟล์นี้ไปเปิดใน iPad หรือ iPhone ต่อได้เลย
-                            </p>
-                        </div>
-                        <button onclick="exportDataJSON()" class="w-full py-3 bg-joox-cardHover border border-joox-green/40 hover:bg-joox-green hover:text-black font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-download"></i> ดาวน์โหลดไฟล์ (.JSON)
-                        </button>
-                    </div>
-
-                    <!-- Import Card -->
-                    <div class="bg-joox-card border border-joox-border rounded-2xl p-6 space-y-4 flex flex-col justify-between">
-                        <div>
-                            <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-3">
-                                <i class="fa-solid fa-file-import"></i>
-                            </div>
-                            <h3 class="font-bold text-lg text-white">นำเข้าข้อมูล (Import)</h3>
-                            <p class="text-xs text-joox-textMuted mt-2 leading-relaxed">
-                                เลือกไฟล์ JSON ที่เคยมองออกจากอุปกรณ์อื่น เพื่อเติมหรือรวมประโยคเข้าสู่คลังของเครื่องนี้
-                            </p>
-                        </div>
-                        <div>
-                            <input type="file" id="importJsonFileInput" accept=".json" class="hidden" onchange="importDataJSON(event)">
-                            <button onclick="document.getElementById('importJsonFileInput').click()" class="w-full py-3 bg-joox-cardHover border border-blue-500/40 hover:bg-blue-600 text-white font-semibold rounded-xl text-sm transition-all flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-upload"></i> เลือกไฟล์เพื่อนำเข้า
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reset Data Options -->
-                <div class="bg-red-950/20 border border-red-900/30 rounded-2xl p-5 flex items-center justify-between">
-                    <div>
-                        <h4 class="text-sm font-bold text-red-400">ล้างข้อมูลคลังประโยค</h4>
-                        <p class="text-xs text-red-300/70">ลบข้อมูลทั้งหมดที่บันทึกไว้ในเครื่องนี้เพื่อเริ่มต้นใหม่</p>
-                    </div>
-                    <button onclick="resetToDefaultData()" class="px-4 py-2 bg-red-900/40 hover:bg-red-800 text-red-200 border border-red-700/50 rounded-xl text-xs transition-all">
-                        ล้างข้อมูล
-                    </button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-
-    <!-- EDIT SENTENCE MODAL (แก้ไขอารมณ์ เจตนา โครงสร้าง) -->
-    <div id="editModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-joox-card border border-joox-border rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl relative animate-fadeIn">
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between border-b border-joox-border pb-3">
-                <h3 class="font-bold text-base text-white flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square text-joox-green"></i> แก้ไขแท็ก & อารมณ์ประโยค
-                </h3>
-                <button onclick="closeEditModal()" class="text-gray-400 hover:text-white text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- Sentence View -->
-            <div class="bg-joox-bg p-3.5 rounded-xl border border-joox-border text-sm text-emerald-300 font-medium leading-relaxed" id="editModalSentenceText">
-                "ตัวอย่างประโยค..."
-            </div>
-
-            <!-- Modal Inputs -->
-            <input type="hidden" id="editModalSentenceId">
-            <div class="space-y-4 text-xs">
-                <!-- Intent -->
-                <div>
-                    <label class="block text-gray-300 font-medium mb-1">1. เจตนาการสื่อสาร (Communication Intent)</label>
-                    <select id="modalIntent" class="w-full bg-joox-bg border border-joox-border rounded-xl p-2.5 text-white focus:border-joox-green outline-none">
-                        <option value="ไม่ได้ระบุ">ไม่ได้ระบุ</option>
-                        <option value="บอกเล่า">ประโยคบอกเล่า (แจ้งเรื่องราว/ข้อมูล)</option>
-                        <option value="ปฏิเสธ">ประโยคปฏิเสธ (มีคำว่า ไม่, ไม่ได้)</option>
-                        <option value="คำถาม">ประโยคคำถาม (ใคร, อะไร, ทำไม)</option>
-                        <option value="คำสั่ง/ห้าม">ประโยคคำสั่ง/ห้าม (อย่า, ห้าม, จง)</option>
-                        <option value="ขอร้อง/ชักชวน">ประโยคขอร้อง/ชักชวน (โปรด, ช่วย, กันเถอะ)</option>
-                        <option value="แสดงความต้องการ">ประโยคแสดงความต้องการ (อยาก, ต้องการ)</option>
-                    </select>
-                </div>
-
-                <!-- Sentence Structure -->
-                <div>
-                    <label class="block text-gray-300 font-medium mb-1">2. รูปแบบโครงสร้าง (Structure Pattern)</label>
-                    <select id="modalStructure" class="w-full bg-joox-bg border border-joox-border rounded-xl p-2.5 text-white focus:border-joox-green outline-none">
-                        <option value="ไม่ได้ระบุ">ไม่ได้ระบุ</option>
-                        <option value="S - V">S - V (ประธาน + กริยา) : เล่าการกระทำทั่วไป</option>
-                        <option value="S - V - O">S - V - O (ประธาน + กริยา + กรรม) : มาตรฐาน</option>
-                        <option value="O - S - V">O - S - V (กรรม + ประธาน + กริยา) : เน้นกรรม</option>
-                        <option value="V - S">V - S (กริยา + ประธาน) : เน้นการมีอยู่/เกิด</option>
-                        <option value="S - V - O1 O2">S - V - O1 O2 (ประธาน + กริยา + กรรมตรง + กรรมรอง) : มอบ/ให้</option>
-                        <option value="S - V - C">S - V - C (ประธาน + กริยาเชื่อม + ส่วนเติมเต็ม) : เป็น/คือ/เปรียบ</option>
-                    </select>
-                </div>
-
-                <!-- Mood Vibe -->
-                <div>
-                    <label class="block text-gray-300 font-medium mb-1">3. อารมณ์ / ความรู้สึก (Mood & Emotion)</label>
-                    <select id="modalMood" class="w-full bg-joox-bg border border-joox-border rounded-xl p-2.5 text-white focus:border-joox-green outline-none">
-                        <option value="ไม่ได้ระบุ">ไม่ได้ระบุ</option>
-                        <option value="อกหัก">อกหัก</option>
-                        <option value="คิดถึง">คิดถึง</option>
-                        <option value="สดใส">สดใส</option>
-                        <option value="แอบรัก">แอบรัก</option>
-                        <option value="เศร้า">เศร้า</option>
-                        <option value="เหงา">เหงา</option>
-                        <option value="อบอุ่น">อบอุ่น</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Save Buttons -->
-            <div class="flex justify-end gap-3 pt-2">
-                <button onclick="closeEditModal()" class="px-4 py-2 bg-joox-bg hover:bg-joox-border text-gray-300 rounded-xl text-xs">ยกเลิก</button>
-                <button onclick="saveModalEdit()" class="px-5 py-2 bg-joox-green hover:bg-joox-greenHover text-black font-semibold rounded-xl text-xs glow-green">บันทึกเปลี่ยนแปลง</button>
-            </div>
-        </div>
+      <nav class="p-3 space-y-1">
+        <button onclick="switchTab('vault')" id="nav-vault" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-joox-green bg-joox-hover">
+          <i class="fa-solid fa-book-bookmark text-base"></i> คลังคำศัพท์
+        </button>
+        <button onclick="switchTab('extract')" id="nav-extract" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-joox-text hover:text-white hover:bg-joox-hover">
+          <i class="fa-solid fa-wand-magic-sparkles text-base"></i> สกัดคำจากบทความ
+        </button>
+        <button onclick="switchTab('rhyme')" id="nav-rhyme" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-joox-text hover:text-white hover:bg-joox-hover">
+          <i class="fa-solid fa-music text-base"></i> ค้นหาคำคล้องจอง
+        </button>
+      </nav>
     </div>
 
+    <div class="p-4 border-t border-joox-border bg-joox-sidebar">
+      <div class="bg-joox-card p-3 rounded-lg border border-joox-border/60 mb-3">
+        <div class="text-xs text-joox-text mb-1">จำนวนคำทั้งหมด</div>
+        <div class="text-xl font-bold text-joox-green" id="stat-total-words">0 คำ</div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="exportData()" class="flex-1 py-2 bg-joox-hover hover:bg-joox-border border border-joox-border rounded-lg text-xs font-medium text-white transition flex items-center justify-center gap-1">
+          <i class="fa-solid fa-download"></i> สำรองข้อมูล
+        </button>
+        <label class="flex-1 py-2 bg-joox-hover hover:bg-joox-border border border-joox-border rounded-lg text-xs font-medium text-white transition flex items-center justify-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-upload"></i> นำเข้า
+          <input type="file" id="import-file" onchange="importData(event)" class="hidden" accept=".json">
+        </label>
+      </div>
+    </div>
+  </aside>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // Default Pre-loaded dataset for initial test
-        const INITIAL_SENTENCES = [
-            { id: "s1", text: "พรุ่งนี้ฉันจะไปเที่ยวทะเล", intent: "บอกเล่า", structure: "S - V - O", mood: "สดใส", syllables: 7 },
-            { id: "s2", text: "เขาไม่ได้เป็นคนทำแจกันแตก", intent: "ปฏิเสธ", structure: "S - V - O", mood: "ไม่ได้ระบุ", syllables: 8 },
-            { id: "s3", text: "คุณจะกลับบ้านกี่โมง", intent: "คำถาม", structure: "S - V", mood: "คิดถึง", syllables: 6 },
-            { id: "s4", text: "ห้ามส่งเสียงดังในห้องหนังสือ", intent: "คำสั่ง/ห้าม", structure: "V - S", mood: "ไม่ได้ระบุ", syllables: 8 },
-            { id: "s5", text: "โปรดถอดรองเท้าก่อนเข้าห้อง", intent: "ขอร้อง/ชักชวน", structure: "S - V", mood: "อบอุ่น", syllables: 7 },
-            { id: "s6", text: "ผมอยากเรียนต่อด้านวิทยาศาสตร์", intent: "แสดงความต้องการ", structure: "S - V - O", mood: "สดใส", syllables: 9 },
-            { id: "s7", text: "ยามเมื่อค่ำคืนนี้ไม่มีแสงดาว", intent: "บอกเล่า", structure: "V - S", mood: "เหงา", syllables: 8 },
-            { id: "s8", text: "หัวใจดวงนี้มันมีแต่เธอ", intent: "บอกเล่า", structure: "S - V - C", mood: "แอบรัก", syllables: 7 },
-            { id: "s9", text: "อย่าปล่อยให้รักของเราสิ้นสุดลง", intent: "คำสั่ง/ห้าม", structure: "S - V", mood: "อกหัก", syllables: 9 },
-            { id: "s10", text: "ฉันมอบดอกไม้ชิ้นนี้ให้เธอ", intent: "บอกเล่า", structure: "S - V - O1 O2", mood: "อบอุ่น", syllables: 8 },
-            { id: "s11", text: "ฝนตกในใจของฉันทุกวัน", intent: "บอกเล่า", structure: "V - S", mood: "เศร้า", syllables: 7 },
-            { id: "s12", text: "คิดถึงเธอเหลือเกินในตอนนี้", intent: "บอกเล่า", structure: "S - V", mood: "คิดถึง", syllables: 8 }
-        ];
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 flex flex-col h-full bg-joox-black overflow-hidden relative">
+    
+    <header class="h-16 border-b border-joox-border px-6 flex items-center justify-between shrink-0 bg-joox-black/80 backdrop-blur z-10">
+      <div class="flex items-center gap-4 w-full max-w-xl">
+        <div class="relative w-full">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-joox-text"></i>
+          <input type="text" id="global-search" oninput="renderVault()" placeholder="ค้นหาคำศัพท์..." class="w-full bg-joox-card border border-joox-border rounded-full py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-joox-green text-white placeholder-joox-text transition">
+        </div>
+      </div>
+      <button onclick="openAddWordModal()" class="ml-4 bg-joox-green hover:bg-joox-darkGreen text-joox-black px-4 py-2 rounded-full font-semibold text-sm transition flex items-center gap-2 shrink-0 neon-glow">
+        <i class="fa-solid fa-plus"></i> เพิ่มคำใหม่
+      </button>
+    </header>
 
-        // Store App State in Memory
-        let sentences = [];
+    <div class="flex-1 overflow-y-auto p-6">
 
-        // App Initialization
-        window.onload = function() {
-            loadLocalData();
-            renderVaultSentences();
-            updateTotalStats();
-        };
+      <!-- TAB 1: WORD VAULT -->
+      <section id="tab-vault" class="space-y-6">
+        <div class="bg-joox-card p-4 rounded-xl border border-joox-border space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-joox-border/50 pb-3">
+            <div class="text-sm font-medium text-white flex items-center gap-2">
+              <i class="fa-solid fa-filter text-joox-green"></i> ตัวกรองคำศัพท์
+            </div>
+            <button onclick="resetFilters()" class="text-xs text-joox-text hover:text-joox-green transition">ล้างตัวกรองทั้งหมด</button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-joox-text mb-1">จำนวนพยางค์</label>
+              <select id="filter-syllables" onchange="renderVault()" class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-joox-green">
+                <option value="">ทั้งหมด</option>
+                <option value="1">1 พยางค์</option>
+                <option value="2">2 พยางค์</option>
+                <option value="3">3 พยางค์</option>
+                <option value="4+">4+ พยางค์</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-joox-text mb-1">ชนิดของคำ</label>
+              <select id="filter-pos" onchange="renderVault()" class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-joox-green">
+                <option value="">ทั้งหมด</option>
+                <option value="นาม">คำนาม</option>
+                <option value="กริยา">คำกริยา</option>
+                <option value="คุณศัพท์">คำคุณศัพท์ (บอกอารมณ์)</option>
+                <option value="วิเศษณ์">คำวิเศษณ์</option>
+                <option value="ทั่วไป">ทั่วไป</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-joox-text mb-1">อารมณ์ (Mood)</label>
+              <select id="filter-mood" onchange="renderVault()" class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-joox-green">
+                <option value="">ทั้งหมด</option>
+                <option value="คิดถึง">คิดถึง</option>
+                <option value="อกหัก">อกหัก</option>
+                <option value="เหงา">เหงา</option>
+                <option value="สดใส">สดใส</option>
+                <option value="เศร้า">เศร้า</option>
+                <option value="อบอุ่น">อบอุ่น</option>
+                <option value="สนุก">สนุก</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-        // LocalStorage Loader
-        function loadLocalData() {
-            const stored = localStorage.getItem('goldhair_sentences');
-            if (stored) {
-                try {
-                    sentences = JSON.parse(stored);
-                } catch(e) {
-                    sentences = [...INITIAL_SENTENCES];
-                }
-            } else {
-                sentences = [...INITIAL_SENTENCES];
-                saveLocalData();
-            }
+        <div id="words-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+      </section>
+
+      <!-- TAB 2: EXTRACT WORDS -->
+      <section id="tab-extract" class="hidden space-y-6">
+        <div class="bg-joox-card p-6 rounded-xl border border-joox-border">
+          <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-wand-magic-sparkles text-joox-green"></i> สกัดคำจากบทความ หรือ นิยาย
+          </h2>
+          <p class="text-xs text-joox-text mb-4">วางเนื้อหาลงในช่องด้านล่าง ระบบจะแยกเป็นประโยค คัดประโยคซ้ำ และเลือกบันทึกลงคลัง</p>
+          
+          <textarea id="extract-input" rows="7" placeholder="วางบทความ นิยาย หรือเนื้อเพลงที่นี่..." class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-4 text-sm text-white focus:outline-none focus:border-joox-green mb-4 resize-y placeholder-joox-text/50"></textarea>
+          
+          <div class="flex justify-end">
+            <button onclick="processExtraction()" class="bg-joox-green hover:bg-joox-darkGreen text-joox-black font-semibold px-6 py-2.5 rounded-lg text-sm transition flex items-center gap-2 neon-glow">
+              <i class="fa-solid fa-gears"></i> แยกประโยค
+            </button>
+          </div>
+        </div>
+
+        <div id="extract-results-container" class="hidden bg-joox-card p-6 rounded-xl border border-joox-border">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-white text-md">ประโยคที่พบ (<span id="extract-count" class="text-joox-green">0</span> คำ)</h3>
+            <button onclick="saveExtractedWords()" class="bg-joox-green hover:bg-joox-darkGreen text-joox-black font-semibold px-4 py-2 rounded-lg text-xs transition flex items-center gap-2">
+              <i class="fa-solid fa-floppy-disk"></i> บันทึกประโยคทั้งหมดลงคลัง
+            </button>
+          </div>
+          <div id="extract-word-tags" class="flex flex-wrap gap-2 max-h-96 overflow-y-auto p-2 bg-joox-sidebar rounded-lg border border-joox-border"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: EXACT RHYME FINDER -->
+      <section id="tab-rhyme" class="hidden space-y-6">
+        <div class="bg-joox-card p-6 rounded-xl border border-joox-border">
+          <h2 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-music text-joox-green"></i> ค้นหาคำคล้องจอง (Exact Rhyme Finder)
+          </h2>
+          <p class="text-xs text-joox-text mb-4">พิมพ์คำเดียว ระบบจะดูคำท้ายประโยค แล้วแสดงทุกประโยคที่ลงท้ายด้วยเสียงคล้องจองกัน เช่น ใจ / ไหม / ใคร / ไหว</p>
+          
+          <div class="flex gap-3 max-w-md">
+            <input type="text" id="rhyme-input" onkeypress="if(event.key==='Enter') searchRhyme()" placeholder="พิมพ์คำ เช่น ใจ, ทำไม, ใคร, ไหวไหม..." class="flex-1 bg-joox-sidebar border border-joox-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-joox-green">
+            <button onclick="searchRhyme()" class="bg-joox-green hover:bg-joox-darkGreen text-joox-black font-semibold px-5 py-2.5 rounded-lg text-sm transition shrink-0 flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass"></i> ค้นหา
+            </button>
+          </div>
+        </div>
+
+        <div id="rhyme-results-container" class="hidden space-y-4">
+          <div class="flex items-center justify-between border-b border-joox-border pb-3">
+            <h3 class="font-bold text-white text-md flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-joox-green"></span>
+              ประโยคที่ลงท้ายด้วยเสียงคล้องจองกับ "<span id="rhyme-target-word" class="text-joox-green"></span>"
+              <span id="rhyme-count-badge" class="text-xs bg-joox-sidebar border border-joox-border px-2.5 py-0.5 rounded-full text-joox-text">0 คำ</span>
+            </h3>
+          </div>
+          <div id="exact-rhyme-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL: ADD/EDIT WORD -->
+  <div id="word-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-joox-card border border-joox-border rounded-xl w-full max-w-lg p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-joox-border pb-3">
+        <h3 id="modal-title" class="font-bold text-white text-lg">เพิ่มคำศัพท์ใหม่</h3>
+        <button onclick="closeModal()" class="text-joox-text hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <input type="hidden" id="modal-word-id">
+
+      <div>
+        <label class="block text-xs text-joox-text mb-1">คำศัพท์ / วลี <span class="text-red-500">*</span></label>
+        <input type="text" id="modal-text" placeholder="ระบุคำศัพท์..." class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-joox-green">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs text-joox-text mb-1">จำนวนพยางค์</label>
+          <select id="modal-syllables" class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-joox-green">
+            <option value="1">1 พยางค์</option>
+            <option value="2">2 พยางค์</option>
+            <option value="3">3 พยางค์</option>
+            <option value="4+">4+ พยางค์</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs text-joox-text mb-1">ชนิดของคำ</label>
+          <select id="modal-pos" class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-joox-green">
+            <option value="ทั่วไป">ทั่วไป</option>
+            <option value="นาม">คำนาม</option>
+            <option value="กริยา">คำกริยา</option>
+            <option value="คุณศัพท์">คำคุณศัพท์ (บอกอารมณ์)</option>
+            <option value="วิเศษณ์">คำวิเศษณ์</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs text-joox-text mb-1">อารมณ์ (Mood)</label>
+        <select id="modal-mood" class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2 text-xs text-white focus:outline-none focus:border-joox-green">
+          <option value="">ไม่ระบุ</option>
+          <option value="คิดถึง">คิดถึง</option>
+          <option value="อกหัก">อกหัก</option>
+          <option value="เหงา">เหงา</option>
+          <option value="สดใส">สดใส</option>
+          <option value="เศร้า">เศร้า</option>
+          <option value="อบอุ่น">อบอุ่น</option>
+          <option value="สนุก">สนุก</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs text-joox-text mb-1">โน้ตเพิ่มเติม / ตัวอย่างการใช้</label>
+        <textarea id="modal-note" rows="2" placeholder="ระบุความหมาย หรือบริบท..." class="w-full bg-joox-sidebar border border-joox-border rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-joox-green resize-none"></textarea>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-joox-border">
+        <button onclick="closeModal()" class="px-4 py-2 bg-joox-hover text-joox-text hover:text-white rounded-lg text-xs font-medium">ยกเลิก</button>
+        <button onclick="saveWordFromModal()" class="px-5 py-2 bg-joox-green hover:bg-joox-darkGreen text-joox-black font-semibold rounded-lg text-xs transition">บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- INITIAL DATA ---
+    let words = JSON.parse(localStorage.getItem('goldhair_words')) || [
+      { id: '1', text: 'ดวงดาว', syllables: '2', pos: 'นาม', mood: 'คิดถึง', note: 'ใช้เปรียบเทียบความฝันหรือคนที่อยู่ไกล' },
+      { id: '2', text: 'เหงา', syllables: '1', pos: 'คุณศัพท์', mood: 'เหงา', note: 'ความรู้สึกว่างเปล่า' },
+      { id: '3', text: 'กอด', syllables: '1', pos: 'กริยา', mood: 'อบอุ่น', note: 'การแสดงความรัก' },
+      { id: '4', text: 'ขอบฟ้า', syllables: '2', pos: 'นาม', mood: 'คิดถึง', note: 'ระยะทางที่ไกลสุดสายตา' },
+      { id: '5', text: 'เจ็บปวด', syllables: '2', pos: 'คุณศัพท์', mood: 'อกหัก', note: 'อารมณ์ความเศร้าเสียใจ' },
+      { id: '6', text: 'ความฝัน', syllables: '2', pos: 'นาม', mood: 'สดใส', note: 'เป้าหมายชีวิต' },
+      { id: '7', text: 'สายลม', syllables: '2', pos: 'นาม', mood: 'เหงา', note: 'สิ่งที่พัดผ่านไป' },
+      { id: '8', text: 'หัวใจ', syllables: '2', pos: 'นาม', mood: 'อบอุ่น', note: 'ศูนย์รวมความรู้สึก' },
+      { id: '9', text: 'มองตา', syllables: '2', pos: 'กริยา', mood: 'อบอุ่น', note: 'สบตากัน' },
+      { id: '10', text: 'น้ำตา', syllables: '2', pos: 'นาม', mood: 'เศร้า', note: 'หยดน้ำตา' }
+    ];
+
+    let extractedWordsBuffer = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      saveAndRefresh();
+    });
+
+    function saveAndRefresh() {
+      localStorage.setItem('goldhair_words', JSON.stringify(words));
+      document.getElementById('stat-total-words').innerText = `${words.length} คำ`;
+      renderVault();
+    }
+
+    function switchTab(tab) {
+      ['vault', 'extract', 'rhyme'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const navBtn = document.getElementById(`nav-${t}`);
+        navBtn.classList.remove('text-joox-green', 'bg-joox-hover');
+        navBtn.classList.add('text-joox-text');
+      });
+
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tab}`);
+      activeNav.classList.add('text-joox-green', 'bg-joox-hover');
+      activeNav.classList.remove('text-joox-text');
+    }
+
+    function renderVault() {
+      const search = document.getElementById('global-search').value.toLowerCase();
+      const sylFilter = document.getElementById('filter-syllables').value;
+      const posFilter = document.getElementById('filter-pos').value;
+      const moodFilter = document.getElementById('filter-mood').value;
+
+      const filtered = words.filter(w => {
+        const matchesSearch = w.text.toLowerCase().includes(search) || (w.note && w.note.toLowerCase().includes(search));
+        const matchesSyl = !sylFilter || w.syllables === sylFilter;
+        const matchesPos = !posFilter || w.pos === posFilter;
+        const matchesMood = !moodFilter || w.mood === moodFilter;
+        return matchesSearch && matchesSyl && matchesPos && matchesMood;
+      });
+
+      const grid = document.getElementById('words-grid');
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-joox-text text-sm">ไม่พบคำหรือประโยคที่ค้นหา</div>`;
+        return;
+      }
+
+      filtered.forEach(w => grid.appendChild(createWordCard(w)));
+    }
+
+    function createWordCard(word) {
+      const card = document.createElement('div');
+      card.className = 'bg-joox-card p-4 rounded-xl border border-joox-border hover:border-joox-green/50 transition group flex flex-col justify-between';
+      card.innerHTML = `
+        <div>
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h4 class="font-bold text-white text-lg group-hover:text-joox-green transition">${word.text}</h4>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-joox-sidebar text-joox-green border border-joox-border">${word.syllables} พยางค์</span>
+          </div>
+          ${word.note ? `<p class="text-xs text-joox-text mb-3 line-clamp-2">${word.note}</p>` : ''}
+        </div>
+        <div>
+          <div class="flex flex-wrap gap-1.5 mb-3">
+            <span class="text-[10px] px-2 py-0.5 rounded bg-joox-hover text-joox-text">${word.pos || 'ทั่วไป'}</span>
+            ${word.mood ? `<span class="text-[10px] px-2 py-0.5 rounded bg-joox-green/10 text-joox-green border border-joox-green/20">${word.mood}</span>` : ''}
+          </div>
+          <div class="flex justify-end gap-2 border-t border-joox-border/40 pt-2 opacity-60 group-hover:opacity-100 transition">
+            <button onclick="openEditWordModal('${word.id}')" class="text-xs text-joox-text hover:text-white p-1"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteWord('${word.id}')" class="text-xs text-joox-text hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    function resetFilters() {
+      document.getElementById('global-search').value = '';
+      document.getElementById('filter-syllables').value = '';
+      document.getElementById('filter-pos').value = '';
+      document.getElementById('filter-mood').value = '';
+      renderVault();
+    }
+
+    // --- THAI SONGWRITER RHYME SEARCH ---
+    // จัดสัมผัสตามเสียงสระและเสียงตัวสะกดท้ายพยางค์ ไม่สนเสียงวรรณยุกต์
+    function normalizeThai(text) {
+      return (text || '').normalize('NFC').replace(/[ๆฯ.,!?;:()\[\]{}"“”‘’…—–\-]/g, ' ').trim();
+    }
+
+    function lastWordOf(text) {
+      const parts = normalizeThai(text).split(/\s+/).filter(Boolean);
+      return parts.length ? parts[parts.length - 1] : '';
+    }
+
+    function getRhymeKey(text) {
+      const word = lastWordOf(text).replace(/[^\u0E00-\u0E7F]/g, '').replace(/[่-๋็์]/g, '');
+      if (!word) return '';
+
+      // เสียงไอรวม ใ-, ไ-, -าย เช่น ใจ/ไหม/ใคร/ไหว/สาย
+      // สระประสมและสระเกินต้องตรวจสอบก่อนสระเดี่ยว
+      let vowel = '';
+      if (/[ใไ]/.test(word) || /าย$/.test(word)) vowel = 'AI';
+      else if (/เ/.test(word) && /า/.test(word)) vowel = 'AO';
+      else if (/เ/.test(word) && /ี/.test(word) && /ว$/.test(word)) vowel = 'IAO';
+      else if (/เ/.test(word) && /ี/.test(word)) vowel = 'IA';
+      else if (/เ/.test(word) && /ื/.test(word)) vowel = 'UEA';
+      else if (/ั/.test(word) && /ว$/.test(word)) vowel = 'UA';
+      else if (/อัว/.test(word)) vowel = 'UA';
+      else if (/ำ/.test(word) || /าม$/.test(word)) vowel = 'AM';
+      else if (/โ/.test(word)) vowel = 'O_LONG';
+      else if (/แ/.test(word)) vowel = /็/.test(word) ? 'AE_SHORT' : 'AE_LONG';
+      else if (/เ/.test(word)) vowel = /็|แ/.test(word) ? 'E_SHORT' : (/อ/.test(word) ? 'OE' : 'E_LONG');
+      else if (/ั/.test(word) || /ะ/.test(word)) vowel = /ั/.test(word) ? 'A_SHORT' : 'A_SHORT';
+      else if (/ิ/.test(word)) vowel = 'I_SHORT';
+      else if (/ี/.test(word)) vowel = 'I_LONG';
+      else if (/ึ/.test(word)) vowel = 'UE_SHORT';
+      else if (/ื/.test(word)) vowel = 'UE_LONG';
+      else if (/ุ/.test(word)) vowel = 'U_SHORT';
+      else if (/ู/.test(word)) vowel = 'U_LONG';
+      else if (/อ/.test(word)) vowel = 'OR_LONG';
+      else if (/า/.test(word)) vowel = 'AA_LONG';
+      else vowel = 'UNKNOWN';
+
+      // ตัวสะกดไทยหลายรูปออกเสียงท้ายเหมือนกัน (แม่กก กด กบ กน กม เกย เกอว)
+      // แยกเสียงท้ายเพื่อไม่ให้สระเดียวกันแต่ตัวสะกดคนละเสียงถูกรวมผิดกลุ่ม
+      const last = word.slice(-1);
+      let coda = 'OPEN';
+      if (/[กขคฆ]/.test(last)) coda = 'K';
+      else if (/[ดจชซฎฏฐฑฒตถทธศษส]/.test(last)) coda = 'T';
+      else if (/[บปพฟภ]/.test(last)) coda = 'P';
+      else if (/[นณญรลฬ]/.test(last)) coda = 'N';
+      else if (last === 'ม') coda = 'M';
+      else if (last === 'ง') coda = 'NG';
+      else if (last === 'ย') coda = 'Y';
+      else if (last === 'ว') coda = 'W';
+
+      // ใ/ไ และ -าย มีเสียงท้ายเป็นสระไอ ไม่มีตัวสะกดแยก
+      if (vowel === 'AI') coda = 'OPEN';
+      // สระอำมีเสียง ม ปิดท้าย แม้ไม่มี ม เขียนเป็นตัวสะกด
+      if (vowel === 'AM') coda = 'M';
+      return `${vowel}_${coda}`;
+    }
+
+    function searchRhyme() {
+      const input = document.getElementById('rhyme-input').value.trim();
+      if (!input) return;
+
+      const targetKey = getRhymeKey(input);
+
+      // ค้นจากคำท้ายของแต่ละประโยค/วลีที่เก็บไว้ และไม่แสดงรายการที่เป็นคำค้นเดียวกัน
+      const exactMatches = words.filter(w => {
+        if (normalizeThai(w.text) === normalizeThai(input)) return false;
+        return getRhymeKey(w.text) === targetKey;
+      });
+
+      document.getElementById('rhyme-target-word').innerText = input;
+      document.getElementById('rhyme-count-badge').innerText = `${exactMatches.length} คำ`;
+      
+      const exactGrid = document.getElementById('exact-rhyme-grid');
+      exactGrid.innerHTML = '';
+
+      if (exactMatches.length === 0) {
+        exactGrid.innerHTML = `
+          <div class="col-span-full py-12 text-center border border-dashed border-joox-border rounded-xl bg-joox-sidebar/50">
+            <i class="fa-solid fa-circle-exclamation text-2xl text-joox-text mb-2"></i>
+            <div class="text-sm text-white font-medium">ไม่พบประโยคที่ลงท้ายด้วยเสียงคล้องจองกับ "${input}" ในคลัง</div>
+            <div class="text-xs text-joox-text mt-1">เพิ่มประโยคหรือวลีลงคลัง แล้วค้นหาใหม่ได้เลย</div>
+          </div>`;
+      } else {
+        exactMatches.forEach(w => exactGrid.appendChild(createWordCard(w)));
+      }
+
+      document.getElementById('rhyme-results-container').classList.remove('hidden');
+    }
+
+    // --- EXTRACTION LOGIC ---
+    function processExtraction() {
+      const text = document.getElementById('extract-input').value;
+      if (!text.trim()) return;
+
+      const rawSentences = text
+        .replace(/\r/g, '')
+        .split(/(?<=[.!?。！？…])|\n+/)
+        .map(s => s.replace(/^[\s"“”‘’]+|[\s"“”‘’]+$/g, '').trim())
+        .filter(s => s.length > 0);
+
+      const existingSet = new Set(words.map(w => normalizeThai(w.text)));
+      const extractedSet = new Set();
+      rawSentences.forEach(sentence => {
+        const key = normalizeThai(sentence);
+        if (key && !existingSet.has(key)) extractedSet.add(sentence);
+      });
+      extractedWordsBuffer = Array.from(extractedSet);
+      const container = document.getElementById('extract-results-container');
+      const tagsContainer = document.getElementById('extract-word-tags');
+      document.getElementById('extract-count').innerText = extractedWordsBuffer.length;
+      tagsContainer.innerHTML = '';
+
+      if (extractedWordsBuffer.length === 0) {
+        tagsContainer.innerHTML = `<span class="text-xs text-joox-text p-2">ไม่พบประโยคใหม่</span>`;
+      } else {
+        extractedWordsBuffer.forEach(word => {
+          const tag = document.createElement('span');
+          tag.className = 'px-3 py-1.5 rounded-lg bg-joox-card text-xs text-white border border-joox-border flex items-center gap-2';
+          tag.innerHTML = `${word} <i onclick="removeExtractedTag('${word}', this)" class="fa-solid fa-xmark text-joox-text hover:text-red-400 cursor-pointer text-xs"></i>`;
+          tagsContainer.appendChild(tag);
+        });
+      }
+
+      container.classList.remove('hidden');
+    }
+
+    function removeExtractedTag(word, el) {
+      extractedWordsBuffer = extractedWordsBuffer.filter(w => w !== word);
+      el.parentElement.remove();
+      document.getElementById('extract-count').innerText = extractedWordsBuffer.length;
+    }
+
+    function saveExtractedWords() {
+      if (extractedWordsBuffer.length === 0) return;
+
+      extractedWordsBuffer.forEach(wordText => {
+        words.push({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          text: wordText,
+          syllables: estimateSyllables(wordText),
+          pos: 'ทั่วไป',
+          mood: '',
+          note: 'ประโยคจากบทความ'
+        });
+      });
+
+      saveAndRefresh();
+      document.getElementById('extract-input').value = '';
+      document.getElementById('extract-results-container').classList.add('hidden');
+      switchTab('vault');
+    }
+
+    function estimateSyllables(text) {
+      const vowels = (text.match(/[\u0E30-\u0E3A\u0E45-\u0E4E]/g) || []).length;
+      return vowels > 0 ? (vowels > 3 ? '4+' : vowels.toString()) : '1';
+    }
+
+    // --- MODAL FUNCTIONS ---
+    function openAddWordModal() {
+      document.getElementById('modal-title').innerText = 'เพิ่มคำศัพท์ใหม่';
+      document.getElementById('modal-word-id').value = '';
+      document.getElementById('modal-text').value = '';
+      document.getElementById('modal-syllables').value = '1';
+      document.getElementById('modal-pos').value = 'ทั่วไป';
+      document.getElementById('modal-mood').value = '';
+      document.getElementById('modal-note').value = '';
+      document.getElementById('word-modal').classList.remove('hidden');
+      document.getElementById('word-modal').classList.add('flex');
+    }
+
+    function openEditWordModal(id) {
+      const word = words.find(w => w.id === id);
+      if (!word) return;
+
+      document.getElementById('modal-title').innerText = 'แก้ไขคำศัพท์';
+      document.getElementById('modal-word-id').value = word.id;
+      document.getElementById('modal-text').value = word.text;
+      document.getElementById('modal-syllables').value = word.syllables || '1';
+      document.getElementById('modal-pos').value = word.pos || 'ทั่วไป';
+      document.getElementById('modal-mood').value = word.mood || '';
+      document.getElementById('modal-note').value = word.note || '';
+
+      document.getElementById('word-modal').classList.remove('hidden');
+      document.getElementById('word-modal').classList.add('flex');
+    }
+
+    function closeModal() {
+      document.getElementById('word-modal').classList.add('hidden');
+      document.getElementById('word-modal').classList.remove('flex');
+    }
+
+    function saveWordFromModal() {
+      const id = document.getElementById('modal-word-id').value;
+      const text = document.getElementById('modal-text').value.trim();
+      const syllables = document.getElementById('modal-syllables').value;
+      const pos = document.getElementById('modal-pos').value;
+      const mood = document.getElementById('modal-mood').value;
+      const note = document.getElementById('modal-note').value.trim();
+
+      if (!text) return;
+
+      if (id) {
+        const word = words.find(w => w.id === id);
+        if (word) {
+          word.text = text;
+          word.syllables = syllables;
+          word.pos = pos;
+          word.mood = mood;
+          word.note = note;
         }
+      } else {
+        words.push({ id: Date.now().toString(), text, syllables, pos, mood, note });
+      }
 
-        function saveLocalData() {
-            localStorage.setItem('goldhair_sentences', JSON.stringify(sentences));
-            updateTotalStats();
+      saveAndRefresh();
+      closeModal();
+    }
+
+    function deleteWord(id) {
+      if (confirm('ต้องการลบคำศัพท์นี้ออกจากคลังหรือไม่?')) {
+        words = words.filter(w => w.id !== id);
+        saveAndRefresh();
+      }
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(words, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `goldhair-vault-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (Array.isArray(imported)) {
+            words = imported;
+            saveAndRefresh();
+            alert('นำเข้าข้อมูลสำเร็จ!');
+          }
+        } catch (err) {
+          alert('รูปแบบไฟล์ JSON ไม่ถูกต้อง');
         }
-
-        function updateTotalStats() {
-            document.getElementById('statTotalSentences').innerText = sentences.length;
-        }
-
-        // Tab Switcher Logic
-        function switchTab(tabName) {
-            ['vault', 'import', 'rhyme', 'backup'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-joox-card transition-all";
-            });
-
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabName}`).classList.add('flex');
-            document.getElementById(`nav-${tabName}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-joox-green/10 text-joox-green border border-joox-green/20";
-        }
-
-        // Helper: Thai Syllable Approximator (Counting Thai Vowels/Nuclei)
-        function countThaiSyllables(text) {
-            if (!text) return 0;
-            // Basic approximation based on vowel clusters & space breaks for Thai
-            const cleaned = text.trim().replace(/\s+/g, '');
-            const vowelsMatches = cleaned.match(/[ะาำิีึืุูเแโใไ็์ัิีึืุู]/g);
-            if (!vowelsMatches) return Math.max(1, Math.round(cleaned.length / 3));
-            return Math.max(1, vowelsMatches.length);
-        }
-
-        // Helper: Extract Last Word / Rhyme Ending Sound
-        function getLastWordSound(sentenceText) {
-            const clean = sentenceText.trim().replace(/[.,!?]/g, '');
-            const parts = clean.split(/\s+/);
-            const lastChunk = parts[parts.length - 1];
-            return lastChunk.slice(-3); // Get last ~2-3 characters for rhyming anchor
-        }
-
-        // RENDER VAULT CARDS
-        function renderVaultSentences() {
-            const listContainer = document.getElementById('vaultList');
-            const emptyState = document.getElementById('vaultEmpty');
-            const searchKeyword = document.getElementById('vaultSearchInput').value.trim().toLowerCase();
-            const sortMode = document.getElementById('vaultSortSelect').value;
-
-            const filterSyl = document.getElementById('filterSyllable').value;
-            const filterIntent = document.getElementById('filterIntent').value;
-            const filterStruct = document.getElementById('filterStructure').value;
-            const filterMood = document.getElementById('filterMood').value;
-
-            // Filter logic
-            let filtered = sentences.filter(s => {
-                // Search keyword
-                if (searchKeyword && !s.text.toLowerCase().includes(searchKeyword)) {
-                    return false;
-                }
-                // Syllable Filter
-                if (filterSyl !== 'ALL') {
-                    if (filterSyl === '5+' && s.syllables < 5) return false;
-                    if (filterSyl !== '5+' && s.syllables !== parseInt(filterSyl)) return false;
-                }
-                // Intent Filter
-                if (filterIntent !== 'ALL' && s.intent !== filterIntent) return false;
-                // Structure Filter
-                if (filterStruct !== 'ALL' && s.structure !== filterStruct) return false;
-                // Mood Filter
-                if (filterMood !== 'ALL' && s.mood !== filterMood) return false;
-
-                return true;
-            });
-
-            // Sorting
-            filtered.sort((a, b) => {
-                if (sortMode === 'newest') return (b.id.replace('s','') - a.id.replace('s','')) || 0;
-                if (sortMode === 'oldest') return (a.id.replace('s','') - b.id.replace('s','')) || 0;
-                if (sortMode === 'lengthAsc') return a.syllables - b.syllables;
-                if (sortMode === 'lengthDesc') return b.syllables - a.syllables;
-            });
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            emptyState.classList.remove('flex');
-
-            listContainer.innerHTML = filtered.map(item => createJOOXSentenceCardHTML(item)).join('');
-        }
-
-        // HTML Card Template (JOOX Style)
-        function createJOOXSentenceCardHTML(item) {
-            const lastSound = getLastWordSound(item.text);
-            return `
-                <div class="bg-joox-card border border-joox-border hover:border-joox-green/50 rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 group">
-                    <div class="space-y-3">
-                        <!-- Top Bar of Card -->
-                        <div class="flex items-center justify-between text-[11px] text-joox-textMuted">
-                            <span class="bg-joox-bg border border-joox-border px-2 py-0.5 rounded-md font-mono text-joox-green">
-                                สัมผัสท้าย: -${lastSound}
-                            </span>
-                            <span class="bg-joox-bg border border-joox-border px-2 py-0.5 rounded-md">
-                                <i class="fa-solid fa-microphone-lines text-joox-green mr-1"></i>${item.syllables} พยางค์
-                            </span>
-                        </div>
-
-                        <!-- Sentence Content -->
-                        <p class="text-white font-medium text-base group-hover:text-joox-green transition-colors leading-relaxed">
-                            "${item.text}"
-                        </p>
-
-                        <!-- Tag Pills -->
-                        <div class="flex flex-wrap gap-1.5 text-[11px] pt-1">
-                            ${item.intent !== 'ไม่ได้ระบุ' ? `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md">${item.intent}</span>` : ''}
-                            ${item.structure !== 'ไม่ได้ระบุ' ? `<span class="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-md">${item.structure}</span>` : ''}
-                            ${item.mood !== 'ไม่ได้ระบุ' ? `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-md">😊 ${item.mood}</span>` : ''}
-                        </div>
-                    </div>
-
-                    <!-- Bottom Action Controls -->
-                    <div class="flex items-center justify-between border-t border-joox-border/60 pt-3 mt-4 text-xs">
-                        <button onclick="copyToClipboard('${item.text.replace(/'/g, "\\'")}')" class="text-joox-textMuted hover:text-joox-green transition-colors flex items-center gap-1.5">
-                            <i class="fa-regular fa-copy"></i> คัดลอก
-                        </button>
-
-                        <div class="flex items-center gap-2">
-                            <button onclick="openEditModal('${item.id}')" class="text-joox-textMuted hover:text-white transition-colors p-1" title="แก้ไขแท็ก">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <button onclick="deleteSentence('${item.id}')" class="text-joox-textMuted hover:text-red-400 transition-colors p-1" title="ลบประโยค">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // TEXT IMPORT ENGINE (ข้อ 1 - สกัดบทความ & ตัดประโยคซ้ำ)
-        function processArticleImport() {
-            const raw = document.getElementById('importRawText').value;
-            if (!raw.trim()) {
-                showToast('กรุณาวางบทความหรือข้อความก่อนครับ', 'warning');
-                return;
-            }
-
-            // Split logic by Thai sentence boundary hints: newlines, periods, multiple spaces
-            const rawSentences = raw
-                .split(/[\n\r.!?]+|\s{2,}/)
-                .map(s => s.trim())
-                .filter(s => s.length >= 3); // Filter out too short garbage
-
-            let newAdded = 0;
-            let duplicateCount = 0;
-            let previewHTML = '';
-
-            rawSentences.forEach(text => {
-                // Check duplicate in existing sentences
-                const exists = sentences.some(existing => existing.text.trim() === text);
-                if (!exists) {
-                    const newObj = {
-                        id: 's' + Date.now() + Math.floor(Math.random()*1000),
-                        text: text,
-                        intent: 'ไม่ได้ระบุ',
-                        structure: 'ไม่ได้ระบุ',
-                        mood: 'ไม่ได้ระบุ',
-                        syllables: countThaiSyllables(text)
-                    };
-                    sentences.unshift(newObj);
-                    newAdded++;
-                    previewHTML += `<div class="p-2.5 bg-joox-bg border border-joox-border rounded-xl flex items-center justify-between">
-                        <span class="text-emerald-300">✓ ${text}</span>
-                        <span class="text-[10px] text-joox-textMuted font-mono">${newObj.syllables} พยางค์</span>
-                    </div>`;
-                } else {
-                    duplicateCount++;
-                }
-            });
-
-            saveLocalData();
-            renderVaultSentences();
-
-            // Display Import Summary
-            document.getElementById('importResultBox').classList.remove('hidden');
-            document.getElementById('importSummaryBadge').innerText = `สกัดได้ ${newAdded} ประโยคใหม่ (${duplicateCount} ซ้ำละเว้น)`;
-            document.getElementById('importPreviewList').innerHTML = previewHTML || `<p class="text-xs text-gray-500">ประโยคทั้งหมดซ้ำกับที่มีอยู่ในคลังแล้ว</p>`;
-
-            showToast(`เพิ่มประโยคสำเร็จ ${newAdded} ประโยค!`, 'success');
-        }
-
-        // THAI RHYME ENGINE (ข้อ 2 - ค้นหาคำคล้องจองสระและมาตราตัวสะกด)
-        function setRhymeInput(word) {
-            document.getElementById('rhymeKeywordInput').value = word;
-            executeRhymeSearch();
-        }
-
-        function executeRhymeSearch() {
-            const word = document.getElementById('rhymeKeywordInput').value.trim();
-            if (!word) {
-                showToast('กรุณาพิมพ์คำหรือพยางค์ที่ต้องการหาคำคล้องจอง', 'warning');
-                return;
-            }
-
-            // Simple Thai vowel/ending matcher rule
-            const keywordTail = word.slice(-2); 
-
-            const matches = sentences.filter(s => {
-                const sText = s.text.trim();
-                const lastPart = sText.slice(-3);
-                // Exact last word match OR rhyme tail sound match OR keyword contained inside sentence
-                return sText.endsWith(word) || lastPart.includes(keywordTail) || sText.includes(word);
-            });
-
-            const grid = document.getElementById('rhymeResultsGrid');
-            document.getElementById('rhymeResultTitle').innerText = `ผลการค้นหาคำคล้องจองกับคำว่า "${word}"`;
-            document.getElementById('rhymeResultCount').innerText = `${matches.length} ประโยค`;
-
-            if (matches.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-12 text-center text-joox-textMuted bg-joox-card border border-joox-border rounded-2xl">
-                        <i class="fa-solid fa-music text-3xl mb-2 text-gray-600"></i>
-                        <p class="text-sm">ยังไม่พบประโยคที่สัมผัสคล้องจองกับคำว่า "${word}" ในคลัง</p>
-                        <p class="text-xs mt-1">ลองเพิ่มบทความใหม่ในเมนู "เพิ่มบทความ"</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = matches.map(item => createJOOXSentenceCardHTML(item)).join('');
-        }
-
-        // MODAL EDIT SYSTEM (ข้อ 3 & 4)
-        function openEditModal(id) {
-            const item = sentences.find(s => s.id === id);
-            if (!item) return;
-
-            document.getElementById('editModalSentenceId').value = item.id;
-            document.getElementById('editModalSentenceText').innerText = `"${item.text}"`;
-            document.getElementById('modalIntent').value = item.intent || 'ไม่ได้ระบุ';
-            document.getElementById('modalStructure').value = item.structure || 'ไม่ได้ระบุ';
-            document.getElementById('modalMood').value = item.mood || 'ไม่ได้ระบุ';
-
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-
-        function saveModalEdit() {
-            const id = document.getElementById('editModalSentenceId').value;
-            const item = sentences.find(s => s.id === id);
-            if (item) {
-                item.intent = document.getElementById('modalIntent').value;
-                item.structure = document.getElementById('modalStructure').value;
-                item.mood = document.getElementById('modalMood').value;
-
-                saveLocalData();
-                renderVaultSentences();
-                closeEditModal();
-                showToast('อัปเดตแท็กประโยคเรียบร้อย', 'success');
-            }
-        }
-
-        // DELETE SENTENCE
-        function deleteSentence(id) {
-            sentences = sentences.filter(s => s.id !== id);
-            saveLocalData();
-            renderVaultSentences();
-            showToast('ลบประโยคเรียบร้อย', 'info');
-        }
-
-        // EXPORT & IMPORT JSON (ข้อ 5 - สำหรับ Macbook/PC/iPad/iPhone Sync)
-        function exportDataJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sentences, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `GOLDHAIR_Vault_Backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast('ส่งออกไฟล์ JSON สำเร็จแล้ว', 'success');
-        }
-
-        function importDataJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        sentences = imported;
-                        saveLocalData();
-                        renderVaultSentences();
-                        showToast('นำเข้าข้อมูลสำเร็จแล้ว!', 'success');
-                    } else {
-                        showToast('รูปแบบไฟล์ JSON ไม่ถูกต้อง', 'warning');
-                    }
-                } catch(err) {
-                    showToast('ไม่สามารถอ่านไฟล์ JSON นี้ได้', 'warning');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function resetToDefaultData() {
-            sentences = [...INITIAL_SENTENCES];
-            saveLocalData();
-            renderVaultSentences();
-            showToast('ล้างข้อมูลเรียบร้อยแล้ว', 'info');
-        }
-
-        // COPY TO CLIPBOARD HELPER
-        function copyToClipboard(text) {
-            const dummy = document.createElement("textarea");
-            document.body.appendChild(dummy);
-            dummy.value = text;
-            dummy.select();
-            document.execCommand("copy");
-            document.body.removeChild(dummy);
-            showToast('คัดลอกประโยคแล้ว!', 'success');
-        }
-
-        // TOAST NOTIFICATION SYSTEM
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            
-            let color = 'bg-joox-card text-white border-joox-green';
-            if (type === 'success') color = 'bg-joox-card text-joox-green border-joox-green';
-            if (type === 'warning') color = 'bg-joox-card text-amber-400 border-amber-400';
-
-            toast.className = `px-4 py-3 rounded-xl border shadow-xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${color}`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
-
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
-        }
-    </script>
+      };
+      reader.readAsText(file);
+    }
+  </script>
 </body>
 </html>
